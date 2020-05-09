@@ -66,9 +66,8 @@ function onMessageHandler (target, context, msg, self) {
     } else if (loaded) {
 	console.log(`* Storing usernames of chatters`);
 	storeNames(us)
-    } else{
-	console.log(msg);
-	// ignoring everything else
+    } else{ // ignoring everything else
+	//console.log(msg);	
     }
 
 }
@@ -94,7 +93,7 @@ function storeNames(username){
 
 // function that reloads the barrel
 async function reload(target){
-    client.say(target, `Loading the barrel...`);
+    //client.say(target, `Loading the barrel...`);
     console.log(`* Executed !reload command`);
     loaded = true;
     await sleep(de);
@@ -106,7 +105,7 @@ async function reload(target){
 // function that purges users that spoke since reload
 async function shot(target){
     loaded = false;
-    console.log(`* Executed !shot command`);
+    //console.log(`* Executed !shot command`);
     client.say(target, `/me SHOTGUN'd!!`);
     for (let usnm in names) {
 	if (Math.random() < 0.4){
