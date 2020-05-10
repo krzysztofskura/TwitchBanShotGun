@@ -1,27 +1,30 @@
-const tmi = require('tmi.js');
+const tmi = require('tmi.js'); // Twitch IRC library
+const Wiimote = require("node-wiimote"); // Require in library to work with wii mote
+
 
 // Define configuration options
 const opts = {
     connection: {
-	reconnect: true,
-	secure: true
+		reconnect: true,
+		secure: true
     },
     identity: {
-	username: `twitchshotgun_bot`,
-	password: `oauth:jojygkeldhnnz6jhuc92o8g809g6k7`
+		username: `twitchshotgun_bot`,
+		password: `oauth:jojygkeldhnnz6jhuc92o8g809g6k7`
     },
     channels: [
-	`dragonmasterk`
+		`giantwaffle`
     ]
 };
 
 //constants
-username = opts.channels[0].replace('#', '');
+channel = opts.channels[0].replace('#', '');
 de = 15000; // delay in miliseconds
 
 //vars
 var names = []; // list of usernames to use
 var loaded = false; // check for gathering names
+var wii = new Wiimote(); // Initialize wiimote library 
 
 // Create a client with our options
 const client = new tmi.client(opts);
@@ -47,27 +50,27 @@ function onMessageHandler (target, context, msg, self) {
     //const channel = target.replace(`#`, ``);
     
     // executing commands
-    if (us == username || us == `dragonmasterk`) {
-	switch(commandName){
-	case `!hello`:
-	    hello(target);
-	    break;
-	case `!reload`:
-	    reload(target);
-	    break;
-	case `!shot`:
-	    shot(target)
-	    break;
-	default:
-	    //client.say(target, `Incorrect command.`);
-	    console.log(`* Unknown command ${commandName}`);
-	    break;
-      }
+    if (us == channel || us == `dragonmasterk`) {
+		switch(commandName){
+			case `hello`:
+				hello(target);
+				break;
+			case `reload`:
+				reload(target);
+				break;
+			case `shot`:
+				shot(target)
+				break;
+			default:
+				//client.say(target, `Incorrect command.`);
+				console.log(`* Unknown command ${commandName}`);
+				break;
+			  }
     } else if (loaded) {
-	console.log(`* Storing usernames of chatters`);
-	storeNames(us)
-    } else{ // ignoring everything else
-	//console.log(msg);	
+		console.log(`* Storing usernames of chatters ${us}`);
+		storeNames(us)
+    } else { // ignoring everything else
+		//console.log(msg);	
     }
 
 }
@@ -83,11 +86,11 @@ function onConnectedHandler (addr, port) {
 //stores usernames of people who have chatted in the past minute
 function storeNames(username){
     if (names.length == 0){
-	names.push(username)
+		names.push(username)
     } else if (names[names.length-1] != username){
-	names.push(username)
+		names.push(username)
     }
-    console.log(`* Executed !reload command`);
+	// console.log(`* Executed storeNames function`);
 }
 
 
@@ -98,19 +101,20 @@ async function reload(target){
     loaded = true;
     await sleep(de);
     names = [];
-    //remove perivous enteries that were timeouts
-    //console.log(`* the logs have been cleared of last timeouts`);
 }
 
 // function that purges users that spoke since reload
 async function shot(target){
     loaded = false;
-    //console.log(`* Executed !shot command`);
-    client.say(target, `/me SHOTGUN'd!!`);
-    for (let usnm in names) {
-	if (Math.random() < 0.4){
-	    client.say(`timeout ${usnm} 1`);
-	}
+    console.log(`* Executed !shot command`);
+    //client.say(target, `/me SHOTGUN'd!!`);
+	
+    for (let usnm of names) {
+		if (Math.random() < 0.6){
+			//client.say(`timeout ${usnm} 1`);
+			//client.timeout(channel, username, 1, "Shotgun ban")
+			console.log(`timeout ${usnm} 1`);
+		}
     }
     names = [];
 }
@@ -126,3 +130,12 @@ async function hello(target){
 const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
+
+// wii compotents
+// b to reload and z or c to shoot
+if (wii.exists) {  
+    var pressAToken = wii.on("button_a", "pressed", handlePressA); // Returns listener token used to remove listeners.  
+    
+	console.log(pressAToken);
+    wii.off(pressAToken); // Takes listener token and removes listener
+}  
