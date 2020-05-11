@@ -1,5 +1,5 @@
 const tmi = require('tmi.js'); // Twitch IRC library
-const Wiimote = require("node-wiimote"); // Require in library to work with wii mote
+const Wiimote = require(`node-wiimote`); // Require in library to work with wii mote
 
 
 // Define configuration options
@@ -59,7 +59,7 @@ function onMessageHandler (target, context, msg, self) {
 				reload(target);
 				break;
 			case `shot`:
-				shot(target)
+				shoot(target)
 				break;
 			default:
 				//client.say(target, `Incorrect command.`);
@@ -104,24 +104,28 @@ async function reload(target){
 }
 
 // function that purges users that spoke since reload
-async function shot(target){
-    loaded = false;
-    console.log(`* Executed !shot command`);
-    //client.say(target, `/me SHOTGUN'd!!`);
-	
-    for (let usnm of names) {
-		if (Math.random() < 0.6){
-			//client.say(`timeout ${usnm} 1`);
-			//client.timeout(channel, username, 1, "Shotgun ban")
-			console.log(`timeout ${usnm} 1`);
+async function shoot(target){
+	if (loaded == true) {
+		loaded = false;
+		console.log(`* Executed !shot command`);
+		//client.say(target, `/me SHOTGUN'd!!`);
+		
+		for (let usnm of names) {
+			if (Math.random() < 0.6){
+				//client.say(`timeout ${usnm} 1`);
+				//client.timeout(channel, usnm, 1, `Shotgun ban`);
+				console.log(`timeout ${channel}, ${usnm}, 1, Shotgun ban`);
+			}
 		}
-    }
-    names = [];
+		names = [];
+	} else {
+		console.log(`You need to reload before shooting`);
+	}
 }
 
 // function test
-async function hello(target){
-    client.say(target, `hello! I'm a bot.`);
+async function hello(){
+    //client.say(target, `hello! I'm a bot.`);
     console.log(`* Executed !hello command`);
     await sleep(de);
 }
@@ -134,8 +138,9 @@ const sleep = (milliseconds) => {
 // wii compotents
 // b to reload and z or c to shoot
 if (wii.exists) {  
-    var pressAToken = wii.on("button_a", "pressed", handlePressA); // Returns listener token used to remove listeners.  
-    
-	console.log(pressAToken);
-    wii.off(pressAToken); // Takes listener token and removes listener
+	wii.setLights(true, false, false, false);
+    var releaseAToken = wii.on(`button_a`, `released`, shoot); // Returns listener token used to remove listeners.  
+    var releaseBToken = wii.on(`button_b`, `released`, reload);
+	
+    //wii.off(pressAToken); // Takes listener token and removes listener
 }  
