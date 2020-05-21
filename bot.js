@@ -50,7 +50,7 @@ function onMessageHandler (target, context, msg, self) {
     //const channel = target.replace(`#`, ``);
     
     // executing commands
-    if (us == channel || us == `dragonmasterk`) {
+    /* if (us == channel || us == `dragonmasterk`) {
 		switch(commandName){
 			case `hello`:
 				hello(target);
@@ -71,16 +71,16 @@ function onMessageHandler (target, context, msg, self) {
 		storeNames(us)
     } else { // ignoring everything else
 		//console.log(msg);	
-    }
-
+    } */
+	
 }
 	
 // Called every time the bot connects to Twitch chat
 function onConnectedHandler (addr, port) {
-    console.log(`* Connected to ${addr}:${port}`);
-    console.log(`& Hello I am your Shutgun Ban bot. \n` +
+    console.log(`* Connected to ${addr}:${port}\nChanne: `+ opts.channels + `\n`);
+    /*console.log(`& Hello I am your Shutgun Ban bot. \n` +
                 `& Prepare for trouble. \n` +
-                `& Connected to channel: ` + opts.channels + `\n`);
+                `& Connected to channel: ` + opts.channels + `\n`);*/
 }
 
 //stores usernames of people who have chatted in the past minute
@@ -135,12 +135,18 @@ const sleep = (milliseconds) => {
     return new Promise(resolve => setTimeout(resolve, milliseconds))
 }
 
+
+function exitApplication() {
+	console.log(`* User ended the application with home button.`);
+	process.exit(1);
+}
+
+
 // wii compotents
-// b to reload and z or c to shoot
+// b to reload and a to shoot
 if (wii.exists) {  
 	wii.setLights(true, false, false, false);
-    var releaseAToken = wii.on(`button_a`, `released`, shoot); // Returns listener token used to remove listeners.  
-    var releaseBToken = wii.on(`button_b`, `released`, reload);
-	
-    //wii.off(pressAToken); // Takes listener token and removes listener
+	var releaseAToken = wii.on(`button_a`, `released`, shoot); // Returns listener token used to remove listeners.  
+	var releaseBToken = wii.on(`button_b`, `released`, reload);
+	var releaseHomeToken = wii.on(`button_home`, `released`, exitApplication);
 }  
